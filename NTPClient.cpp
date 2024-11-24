@@ -148,19 +148,50 @@ int NTPClient::getMinutes() const {
 int NTPClient::getSeconds() const {
   return (this->getEpochTime() % 60);
 }
-
+int NTPClient::getYear() const {
+  time_t rawtime = this->getEpochTime();
+  struct tm *ti;
+  ti = localtime(&rawtime);
+  return ti->tm_year + 1900;
+}
+int NTPClient::getMonth() const {
+  time_t rawtime = this->getEpochTime();
+  struct tm *ti;
+  ti = localtime(&rawtime);
+  return ti->tm_mon + 1;
+}
+int NTPClient::getDate() const {
+  time_t rawtime = this->getEpochTime();
+  struct tm *ti;
+  ti = localtime(&rawtime);
+  return ti->tm_mday;
+}
 String NTPClient::getFormattedTime() const {
   unsigned long rawTime = this->getEpochTime();
-  unsigned long hours = (rawTime % 86400L) / 3600;
-  String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
+  uint8_t hours = (rawTime % 86400L) / 3600;
+  uint8_t minutes = (rawTime % 3600) / 60;
+  uint8_t seconds = rawTime % 60;
 
-  unsigned long minutes = (rawTime % 3600) / 60;
-  String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
+  char *tt = (char *)malloc(10);
+  sprintf(tt, "%02u:%02u:%02u", hours, minutes, seconds);
 
-  unsigned long seconds = rawTime % 60;
-  String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
-
-  return hoursStr + ":" + minuteStr + ":" + secondStr;
+  return String(tt);
+}
+String NTPClient::getFormattedDate() const {
+  time_t rawtime = this->getEpochTime();
+  struct tm *ti;
+  ti = localtime(&rawtime);
+  char *tt = (char *)malloc(20);
+  sprintf(tt, "%04u-%02u-%02u", (ti->tm_year + 1900), (ti->tm_mon + 1), ti->tm_mday, ti->tm_hour, ti->tm_min, ti->tm_sec);
+  return String(tt);
+}
+String NTPClient::getFormattedDateTime() const {
+  time_t rawtime = this->getEpochTime();
+  struct tm *ti;
+  ti = localtime(&rawtime);
+  char *tt = (char *)malloc(20);
+  sprintf(tt, "%04u-%02u-%02u %02u:%02u:%02u", (ti->tm_year + 1900), (ti->tm_mon + 1), ti->tm_mday, ti->tm_hour, ti->tm_min, ti->tm_sec);
+  return String(tt);
 }
 
 void NTPClient::end() {
