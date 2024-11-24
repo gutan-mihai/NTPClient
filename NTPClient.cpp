@@ -131,10 +131,10 @@ bool NTPClient::isTimeSet() const {
 }
 
 bool NTPClient::isDst() const {
-  int date = this.getDate();
-  int month = this.getMonth();
-  int dayOfWeek = this.getDay() + 1;
-  int hour = this.getHours();
+  int date = this->getDate();
+  int month = this->getMonth();
+  int dayOfWeek = this->getDay() + 1;
+  int hour = this->getHours();
 
   // January, February, November, and December are out.
   if (month < 3 || month > 10) { return false; }
