@@ -81,6 +81,16 @@ class NTPClient {
      */
     bool isTimeSet() const;
 
+    /**
+     * Daylight Saving Time (DST) is the practice of adjusting clocks so that afternoons have more daylight and mornings have less.
+     * Central Europe Time
+     * From CET to CEST: last Sunday of March at 02:00 localtime -> 03:00
+     * Frome CEST to CET: last Sunday of October at 03:00 localtime -> 02:00
+     * 
+     * @return true if is DST, else false
+     */
+    bool isDst() const;
+
     int getDay() const;
     int getHours() const;
     int getMinutes() const;

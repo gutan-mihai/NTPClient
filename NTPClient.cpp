@@ -130,6 +130,30 @@ bool NTPClient::isTimeSet() const {
   return (this->_lastUpdate != 0); // returns true if the time has been set, else false
 }
 
+bool NTPClient::isDst() const {
+  int date = this.getDate();
+  int month = this.getMonth();
+  int dayOfWeek = this.getDay() + 1;
+  int hour = this.getHours();
+
+  // January, February, November, and December are out.
+  if (month < 3 || month > 10) { return false; }
+  
+  // April to September are in
+  if (month > 3 && month < 10) { return true; }
+  
+  int previousSunday = date - dayOfWeek + 1;
+  // In March, we are DST if after last Sunday.
+  if (month == 3 && previousSunday >= 25 && dayOfWeek == 1) { return hour >= 2; }
+  if (month == 3) { return previousSunday >= 25; }
+
+  // In October, we are DST if before last Sunday
+  if (previousSunday < 25) { return true; }
+  if (previousSunday >= 25 && dayOfWeek == 1) { return hour < 3; }
+
+  return false;
+}
+
 unsigned long NTPClient::getEpochTime() const {
   return this->_timeOffset + // User offset
          this->_currentEpoc + // Epoch returned by the NTP server
@@ -139,33 +163,40 @@ unsigned long NTPClient::getEpochTime() const {
 int NTPClient::getDay() const {
   return (((this->getEpochTime()  / 86400L) + 4 ) % 7); //0 is Sunday
 }
+
 int NTPClient::getHours() const {
   return ((this->getEpochTime()  % 86400L) / 3600);
 }
+
 int NTPClient::getMinutes() const {
   return ((this->getEpochTime() % 3600) / 60);
 }
+
 int NTPClient::getSeconds() const {
   return (this->getEpochTime() % 60);
 }
+
 int NTPClient::getYear() const {
   time_t rawtime = this->getEpochTime();
   struct tm *ti;
   ti = localtime(&rawtime);
   return ti->tm_year + 1900;
 }
+
 int NTPClient::getMonth() const {
   time_t rawtime = this->getEpochTime();
   struct tm *ti;
   ti = localtime(&rawtime);
   return ti->tm_mon + 1;
 }
+
 int NTPClient::getDate() const {
   time_t rawtime = this->getEpochTime();
   struct tm *ti;
   ti = localtime(&rawtime);
   return ti->tm_mday;
 }
+
 String NTPClient::getFormattedTime() const {
   unsigned long rawTime = this->getEpochTime();
   uint8_t hours = (rawTime % 86400L) / 3600;
@@ -177,6 +208,7 @@ String NTPClient::getFormattedTime() const {
 
   return String(tt);
 }
+
 String NTPClient::getFormattedDate() const {
   time_t rawtime = this->getEpochTime();
   struct tm *ti;
@@ -185,6 +217,7 @@ String NTPClient::getFormattedDate() const {
   sprintf(tt, "%04u-%02u-%02u", (ti->tm_year + 1900), (ti->tm_mon + 1), ti->tm_mday, ti->tm_hour, ti->tm_min, ti->tm_sec);
   return String(tt);
 }
+
 String NTPClient::getFormattedDateTime() const {
   time_t rawtime = this->getEpochTime();
   struct tm *ti;
